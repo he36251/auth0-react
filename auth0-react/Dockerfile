@@ -12,10 +12,13 @@ RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /src
-COPY ["auth0-react/auth0-react.csproj", "auth0-react/"]
+COPY ["auth0-react.csproj", "auth0-react/"]
 RUN dotnet restore "auth0-react/auth0-react.csproj"
+
+WORKDIR /src/auth0-react
 COPY . .
-WORKDIR "/src/auth0-react"
+
+WORKDIR /src/auth0-react
 RUN dotnet build "auth0-react.csproj" -c Release -o /app/build
 
 FROM build AS publish

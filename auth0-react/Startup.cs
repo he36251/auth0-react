@@ -47,12 +47,7 @@ namespace auth0_react
 
             app.UseRouting();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllerRoute("default", "{controller}/{action=Index}/{id?}"); });
 
             app.UseSpa(spa =>
             {
@@ -60,7 +55,7 @@ namespace auth0_react
 
                 if (env.IsDevelopment())
                 {
-                    spa.UseReactDevelopmentServer(npmScript: "start");
+                    spa.UseReactDevelopmentServer("start");
                 }
             });
         }
