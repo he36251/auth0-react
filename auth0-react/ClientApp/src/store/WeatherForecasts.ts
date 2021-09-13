@@ -1,5 +1,5 @@
-import { Action, Reducer } from 'redux';
-import { AppThunkAction } from './';
+import {Action, Reducer} from 'redux';
+import {AppThunkAction} from './';
 
 // -----------------
 // STATE - This defines the type of data maintained in the Redux store.
@@ -41,17 +41,25 @@ type KnownAction = RequestWeatherForecastsAction | ReceiveWeatherForecastsAction
 // They don't directly mutate state, but they can have external side-effects (such as loading data).
 
 export const actionCreators = {
-    requestWeatherForecasts: (startDateIndex: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
+    requestWeatherForecasts: (startDateIndex: number, accessToken: string): AppThunkAction<KnownAction> => async (dispatch, getState) => {
+
+        
+
         // Only load data if it's something we don't already have (and are not already loading)
         const appState = getState();
         if (appState && appState.weatherForecasts && startDateIndex !== appState.weatherForecasts.startDateIndex) {
-            fetch(`weatherforecast`)
+            await fetch(`api/weatherforecast`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`
+                    },
+                })
                 .then(response => response.json() as Promise<WeatherForecast[]>)
                 .then(data => {
-                    dispatch({ type: 'RECEIVE_WEATHER_FORECASTS', startDateIndex: startDateIndex, forecasts: data });
+                    dispatch({type: 'RECEIVE_WEATHER_FORECASTS', startDateIndex: startDateIndex, forecasts: data});
                 });
 
-            dispatch({ type: 'REQUEST_WEATHER_FORECASTS', startDateIndex: startDateIndex });
+            dispatch({type: 'REQUEST_WEATHER_FORECASTS', startDateIndex: startDateIndex});
         }
     }
 };
@@ -59,7 +67,7 @@ export const actionCreators = {
 // ----------------
 // REDUCER - For a given state and action, returns the new state. To support time travel, this must not mutate the old state.
 
-const unloadedState: WeatherForecastsState = { forecasts: [], isLoading: false };
+const unloadedState: WeatherForecastsState = {forecasts: [], isLoading: false};
 
 export const reducer: Reducer<WeatherForecastsState> = (state: WeatherForecastsState | undefined, incomingAction: Action): WeatherForecastsState => {
     if (state === undefined) {
